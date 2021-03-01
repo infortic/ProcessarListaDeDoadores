@@ -19,8 +19,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
+import com.processalistadedoadores.DTO.GetDoadoresPorTiposSanquiniosRequestBodyDTO;
 import com.processalistadedoadores.DTO.GetImcMedioPorFaixaDeIdadeDTO;
+import com.processalistadedoadores.DTO.GetMediaIdadePorFaixaIdadeRequestBodyDTO;
 import com.processalistadedoadores.DTO.GetMediaIdadePorTipoSanguinioDTO;
+import com.processalistadedoadores.DTO.GetMediaIdadePorTipoSanguinioRequestBodyDTO;
 import com.processalistadedoadores.DTO.ListaDoadoresSeparadosPorEstadoDTO;
 import com.processalistadedoadores.entity.Doador;
 import com.processalistadedoadores.service.DoacaoServicos;
@@ -175,7 +178,11 @@ public class ProcessarListaDoadoresTest {
 		doadorList.add(doador2);
 		doadorList.add(doador1);
 
-		List<Doador> doadorListObesos = doacaoServicos.getDoadoresPorGrupoSanguinio(doadorList, "O+");
+		GetDoadoresPorTiposSanquiniosRequestBodyDTO getDoadoresPorTiposSanquiniosRequestBodyDTO = new GetDoadoresPorTiposSanquiniosRequestBodyDTO();
+		
+		getDoadoresPorTiposSanquiniosRequestBodyDTO.setListaDoadores(doadorList);
+		getDoadoresPorTiposSanquiniosRequestBodyDTO.setTipoSanguinio("O+");
+		List<Doador> doadorListObesos = doacaoServicos.getDoadoresPorGrupoSanguinio(getDoadoresPorTiposSanquiniosRequestBodyDTO);
 		Assertions.assertThat(doadorListObesos.size() + "").isEqualTo("2");
 
 	}
@@ -232,7 +239,13 @@ public class ProcessarListaDoadoresTest {
 		doadorList.add(doador2);
 		doadorList.add(doador1);
 
-		List<Doador> doadorListObesos = doacaoServicos.getDoadoresPorGrupoSanguinio(doadorList, "Z");
+		GetDoadoresPorTiposSanquiniosRequestBodyDTO getDoadoresPorTiposSanquiniosRequestBodyDTO = new GetDoadoresPorTiposSanquiniosRequestBodyDTO();
+		
+		getDoadoresPorTiposSanquiniosRequestBodyDTO.setListaDoadores(doadorList);
+		
+		getDoadoresPorTiposSanquiniosRequestBodyDTO.setTipoSanguinio("Z");
+		
+		List<Doador> doadorListObesos = doacaoServicos.getDoadoresPorGrupoSanguinio(getDoadoresPorTiposSanquiniosRequestBodyDTO);
 
 		Assertions.assertThat(doadorListObesos.isEmpty());
 
@@ -406,68 +419,15 @@ public class ProcessarListaDoadoresTest {
 
 		doadorList.add(doador2);
 		doadorList.add(doador1);
+		
+		GetMediaIdadePorFaixaIdadeRequestBodyDTO getMediaIdadePorFaixaIdadeRequestBodyDTO = new GetMediaIdadePorFaixaIdadeRequestBodyDTO();
 
+		getMediaIdadePorFaixaIdadeRequestBodyDTO.setListaDoadores(doadorList);
+		getMediaIdadePorFaixaIdadeRequestBodyDTO.setFaixaIniciaEfinalSeparadosPorVirgula("0,70");
+		
 		GetImcMedioPorFaixaDeIdadeDTO getImcMedioPorFaixaDeIdadeDTO = doacaoServicos
-				.getImcMedioPorFaixaDeIdade(doadorList, "0,70");
+				.getImcMedioPorFaixaDeIdade(getMediaIdadePorFaixaIdadeRequestBodyDTO);
 		Assertions.assertThat(getImcMedioPorFaixaDeIdadeDTO.getMediaImcPorFaixaDeIdade() + "").isEqualTo("32");
-
-	}
-
-	@Test
-	public void getImcMedioPorFaixaDeIdadeFaixaInvalidaTest() {
-
-		Doador doador1 = new Doador();
-
-		doador1.setAltura(new BigDecimal(2));
-		doador1.setBairro("Santo Antônio de Lisboa");
-		doador1.setCelular("38 3323 - 2232");
-		doador1.setCep("33366336");
-		doador1.setCidade("Uberlandia");
-		doador1.setCpf("095.000.036.19");
-		doador1.setDataNascimentoString("02/07/1991");
-		doador1.setEmail("cleitonmoc02@gmail.com");
-		doador1.setEndereco("Alameda Jose de Oliveira Guimarães");
-		doador1.setEstado("MG");
-		doador1.setMae("cristina aparecida Cardoso");
-		doador1.setNome("Cleiton Cardoso Silva");
-		doador1.setNumero(1138);
-		doador1.setPai("Cilso Santos Silva");
-		doador1.setPeso(new BigDecimal(53));
-		doador1.setRg("MG 16.701.394");
-		doador1.setSexo("Masculino");
-		doador1.setTelefoneFixo("38 33232323");
-		doador1.setTipoSanguineo("O+");
-
-		Doador doador2 = new Doador();
-
-		doador2.setAltura(new BigDecimal(2));
-		doador2.setBairro("Santo Antônio de Lisboa");
-		doador2.setCelular("38 3323 - 2232");
-		doador2.setCep("33366336");
-		doador2.setCidade("Uberlandia");
-		doador2.setCpf("095.000.036.19");
-		doador2.setDataNascimentoString("02/07/1991");
-		doador2.setEmail("cleitonmoc02@gmail.com");
-		doador2.setEndereco("Alameda Jose de Oliveira Guimarães");
-		doador2.setEstado("SC");
-		doador2.setMae("cristina aparecida Cardoso");
-		doador2.setNome("Cleiton Cardoso Silva");
-		doador2.setNumero(1138);
-		doador2.setPai("Cilso Santos Silva");
-		doador2.setPeso(new BigDecimal(200));
-		doador2.setRg("MG 16.701.394");
-		doador2.setSexo("Masculino");
-		doador2.setTelefoneFixo("38 33232323");
-		doador2.setTipoSanguineo("O+");
-
-		List<Doador> doadorList = new ArrayList<Doador>();
-
-		doadorList.add(doador2);
-		doadorList.add(doador1);
-
-		GetImcMedioPorFaixaDeIdadeDTO getImcMedioPorFaixaDeIdadeDTO = doacaoServicos
-				.getImcMedioPorFaixaDeIdade(doadorList, "0,10");
-		Assertions.assertThat(getImcMedioPorFaixaDeIdadeDTO.getMediaImcPorFaixaDeIdade() + "").isEqualTo("0");
 
 	}
 
@@ -523,8 +483,13 @@ public class ProcessarListaDoadoresTest {
 		doadorList.add(doador2);
 		doadorList.add(doador1);
 
+		GetMediaIdadePorTipoSanguinioRequestBodyDTO getMediaIdadePorTipoSanguinioRequestBodyDTO = new GetMediaIdadePorTipoSanguinioRequestBodyDTO();
+		
+		getMediaIdadePorTipoSanguinioRequestBodyDTO.setListaDoadores(doadorList);
+		getMediaIdadePorTipoSanguinioRequestBodyDTO.setTipoSanguinio("O+");
+		
 		GetMediaIdadePorTipoSanguinioDTO getMediaIdadePorTipoSanguinioDTO = doacaoServicos
-				.getMediaIdadePorTipoSanguinio(doadorList, "O+");
+				.getMediaIdadePorTipoSanguinio(getMediaIdadePorTipoSanguinioRequestBodyDTO);
 		Assertions.assertThat(getMediaIdadePorTipoSanguinioDTO.getMediaIdade() + "").isEqualTo("30");
 
 	}
@@ -581,8 +546,13 @@ public class ProcessarListaDoadoresTest {
 		doadorList.add(doador2);
 		doadorList.add(doador1);
 
+		GetMediaIdadePorTipoSanguinioRequestBodyDTO getMediaIdadePorTipoSanguinioRequestBodyDTO = new GetMediaIdadePorTipoSanguinioRequestBodyDTO();
+		
+		getMediaIdadePorTipoSanguinioRequestBodyDTO.setListaDoadores(doadorList);
+		getMediaIdadePorTipoSanguinioRequestBodyDTO.setTipoSanguinio("Z");
+		
 		GetMediaIdadePorTipoSanguinioDTO getMediaIdadePorTipoSanguinioDTO = doacaoServicos
-				.getMediaIdadePorTipoSanguinio(doadorList, "Z");
+				.getMediaIdadePorTipoSanguinio(getMediaIdadePorTipoSanguinioRequestBodyDTO);
 		Assertions.assertThat(getMediaIdadePorTipoSanguinioDTO.getMediaIdade() + "").isEqualTo("0");
 	}
 	
@@ -759,8 +729,13 @@ public class ProcessarListaDoadoresTest {
 		doadorList.add(doador2);
 		doadorList.add(doador1);
 
+		GetDoadoresPorTiposSanquiniosRequestBodyDTO getDoadoresPorTiposSanquiniosRequestBodyDTO = new GetDoadoresPorTiposSanquiniosRequestBodyDTO();
+		
+		getDoadoresPorTiposSanquiniosRequestBodyDTO.setListaDoadores(doadorList);
+		getDoadoresPorTiposSanquiniosRequestBodyDTO.setTipoSanguinio("A+");
+		
 		ResponseEntity<?> response = restTemplate.postForEntity(
-				"http://localhost:" + port + "/doador/getDoadoresPorTiposSanquinios?tipoSanquinioList={A+}/", doadorList,
+				"http://localhost:" + port + "/doador/getDoadoresPorTiposSanquinios/", getDoadoresPorTiposSanquiniosRequestBodyDTO,
 				List.class, "application/json");
 		Assertions.assertThat(response.getStatusCodeValue() + "").isEqualTo("200");
 
@@ -817,8 +792,11 @@ public class ProcessarListaDoadoresTest {
 		doadorList.add(doador2);
 		doadorList.add(doador1);
 
+		GetMediaIdadePorFaixaIdadeRequestBodyDTO getMediaIdadePorFaixaIdadeRequestBodyDTO = new GetMediaIdadePorFaixaIdadeRequestBodyDTO();
+		getMediaIdadePorFaixaIdadeRequestBodyDTO.setFaixaIniciaEfinalSeparadosPorVirgula("21,31");
+		getMediaIdadePorFaixaIdadeRequestBodyDTO.setListaDoadores(doadorList);
 		ResponseEntity<?> response = restTemplate.postForEntity(
-				"http://localhost:" + port + "/doador/getMediaImcPorFaixaIdade?faixaIdade={21,31}/", doadorList,
+				"http://localhost:" + port + "/doador/getMediaImcPorFaixaIdade", getMediaIdadePorFaixaIdadeRequestBodyDTO,
 				GetImcMedioPorFaixaDeIdadeDTO.class, MediaType.APPLICATION_JSON);
 		
 		Assertions.assertThat(response.getStatusCodeValue() + "").isEqualTo("200");
@@ -876,8 +854,14 @@ public class ProcessarListaDoadoresTest {
 		doadorList.add(doador2);
 		doadorList.add(doador1);
 
+		GetMediaIdadePorTipoSanguinioRequestBodyDTO getMediaIdadePorTipoSanguinioRequestBodyDTO = new GetMediaIdadePorTipoSanguinioRequestBodyDTO();
+		
+		getMediaIdadePorTipoSanguinioRequestBodyDTO.setListaDoadores(doadorList);
+		getMediaIdadePorTipoSanguinioRequestBodyDTO.setTipoSanguinio("21,31");
+		
+		
 		ResponseEntity<?> response = restTemplate.postForEntity(
-				"http://localhost:" + port + "/doador/getMediaIdadePorTipoSanguinio?tipoSanguinio={21,31}/", doadorList,
+				"http://localhost:" + port + "/doador/getMediaIdadePorTipoSanguinio/",getMediaIdadePorTipoSanguinioRequestBodyDTO,
 				GetImcMedioPorFaixaDeIdadeDTO.class, MediaType.APPLICATION_JSON);
 		
 		Assertions.assertThat(response.getStatusCodeValue() + "").isEqualTo("200");

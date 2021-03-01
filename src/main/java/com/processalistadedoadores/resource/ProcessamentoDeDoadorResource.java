@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.processalistadedoadores.DTO.GetDoadoresPorTiposSanquiniosRequestBodyDTO;
+import com.processalistadedoadores.DTO.GetMediaIdadePorFaixaIdadeRequestBodyDTO;
+import com.processalistadedoadores.DTO.GetMediaIdadePorTipoSanguinioRequestBodyDTO;
 import com.processalistadedoadores.entity.Doador;
 import com.processalistadedoadores.service.DoacaoServicos;
 
@@ -35,20 +38,20 @@ public class ProcessamentoDeDoadorResource {
 	
 	@ApiOperation(value="Encontra Doadores para um determinado Tipo Sanguinio")
 	@RequestMapping(method = RequestMethod.POST, path = "/getDoadoresPorTiposSanquinios")
-	public ResponseEntity<?> getDoadoresPorTipo(@RequestBody List<Doador> doadorListPayLoad,@RequestParam  String tipoSanquinioList) {
-		return new ResponseEntity<>(doacaoServicos.getDoadoresPorGrupoSanguinio(doadorListPayLoad, tipoSanquinioList), HttpStatus.OK);
+	public ResponseEntity<?> getDoadoresPorTiposSanquinios(@RequestBody GetDoadoresPorTiposSanquiniosRequestBodyDTO doadorListPayLoad) {
+		return new ResponseEntity<>(doacaoServicos.getDoadoresPorGrupoSanguinio(doadorListPayLoad), HttpStatus.OK);
 	}
 	
 	@ApiOperation(value="Retorna media IMC por faixa de idade")
 	@RequestMapping(method = RequestMethod.POST, path = "/getMediaImcPorFaixaIdade")
-	public ResponseEntity<?> getMediaImcPorFaixaIdade(@RequestBody List<Doador> doadorListPayLoad, @RequestParam String faixaIdade)  {
-		return new ResponseEntity<>(doacaoServicos.getImcMedioPorFaixaDeIdade(doadorListPayLoad, faixaIdade), HttpStatus.OK);
+	public ResponseEntity<?> getMediaImcPorFaixaIdade(@RequestBody GetMediaIdadePorFaixaIdadeRequestBodyDTO doadorListPayLoad)  {
+		return new ResponseEntity<>(doacaoServicos.getImcMedioPorFaixaDeIdade(doadorListPayLoad), HttpStatus.OK);
 	}
 	
 	@ApiOperation(value="Retorna media de idade por tipo sanguinio")
 	@RequestMapping(method = RequestMethod.POST, path = "/getMediaIdadePorTipoSanguinio")
-	public ResponseEntity<?> getMediaIdadePorTipoSanguinio(@RequestBody List<Doador> doadorListPayLoad, @RequestParam String tipoSanguinio)  {
-		return new ResponseEntity<>(doacaoServicos.getMediaIdadePorTipoSanguinio(doadorListPayLoad, tipoSanguinio), HttpStatus.OK);
+	public ResponseEntity<?> getMediaIdadePorTipoSanguinio(@RequestBody GetMediaIdadePorTipoSanguinioRequestBodyDTO doadorListPayLoad)  {
+		return new ResponseEntity<>(doacaoServicos.getMediaIdadePorTipoSanguinio(doadorListPayLoad), HttpStatus.OK);
 	}
 	
 

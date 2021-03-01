@@ -8,10 +8,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.processalistadedoadores.DTO.GetDoadoresPorTiposSanquiniosRequestBodyDTO;
 import com.processalistadedoadores.DTO.GetImcMedioPorFaixaDeIdadeDTO;
 import com.processalistadedoadores.DTO.GetImcMedioPorFaixaDeIdadeDTO.GetImcMedioPorFaixaDeIdadeDTOBuilder;
 import com.processalistadedoadores.DTO.GetMediaIdadePorTipoSanguinioDTO;
 import com.processalistadedoadores.DTO.GetMediaIdadePorTipoSanguinioDTO.GetMediaIdadePorTipoSanguinioDTOBuilder;
+import com.processalistadedoadores.DTO.GetMediaIdadePorTipoSanguinioRequestBodyDTO;
+import com.processalistadedoadores.DTO.GetMediaIdadePorFaixaIdadeRequestBodyDTO;
 import com.processalistadedoadores.DTO.ListaDoadoresSeparadosPorEstadoDTO;
 import com.processalistadedoadores.DTO.ListaDoadoresSeparadosPorEstadoDTO.ListaDoadoresSeparadosPorEstadoDTOBuilder;
 import com.processalistadedoadores.Enum.EstadosENUM;
@@ -40,7 +43,7 @@ public class DoacaoServicos {
 		List<Doador> doadoresObesos = new ArrayList<>();
 		for (Doador doador : doadorList) {
 			BigDecimal imc = calculaIMC(doador);
-			if (imc.compareTo(LIMITE_IMC_PARA_OBESIDADE) == 1) {
+			if (imc.compareTo(LIMITE_IMC_PARA_OBESIDADE) == 1 && this.validaDoador(doador)) {
 				doadoresObesos.add(doador);
 			}
 		}
@@ -61,29 +64,29 @@ public class DoacaoServicos {
 
 	}
 
-	public List<Doador> getDoadoresPorGrupoSanguinio(List<Doador> doadorList, String tipoSanquinioList) {
+	public List<Doador> getDoadoresPorGrupoSanguinio(GetDoadoresPorTiposSanquiniosRequestBodyDTO getDoadoresPorTiposSanquiniosRequestBodyDTO) {
 		List<Doador> doadoresParaTipoSanguinioRecebitoComoParametro = new ArrayList<>();
-		for (Doador doador : doadorList) {
-			if (tipoSanquinioList.contains(doador.getTipoSanguineo()) && this.validaDoador(doador)) {
+		for (Doador doador : getDoadoresPorTiposSanquiniosRequestBodyDTO.getListaDoadores()) {
+			if (getDoadoresPorTiposSanquiniosRequestBodyDTO.getTipoSanguinio().contains(doador.getTipoSanguineo()) && this.validaDoador(doador)) {
 				doadoresParaTipoSanguinioRecebitoComoParametro.add(doador);
 			}
 		}
 		return doadoresParaTipoSanguinioRecebitoComoParametro;
 	}
 
-	public GetImcMedioPorFaixaDeIdadeDTO getImcMedioPorFaixaDeIdade(List<Doador> doadorList, String faixaIdade) {
+	public GetImcMedioPorFaixaDeIdadeDTO getImcMedioPorFaixaDeIdade(GetMediaIdadePorFaixaIdadeRequestBodyDTO getMediaIdadePorTipoSanguinioRequestBodyDTO) {
 
 		BigDecimal mediaImcPorFaixaDeIdade = new BigDecimal(0);
 		BigDecimal toalImcFaixaIdade = new BigDecimal(0);
 		BigDecimal numeroDeGrandezas = new BigDecimal(0);
-		String[] stringArray = faixaIdade.split(",");
+		String[] stringArray = getMediaIdadePorTipoSanguinioRequestBodyDTO.getFaixaIniciaEfinalSeparadosPorVirgula().split(",");
 		List<Integer> faixaIdadeList = new ArrayList<Integer>();
 
 		if (stringArray.length > 1) {
 			for (String string : stringArray) {
 				faixaIdadeList.add(Integer.valueOf(string));
 			}
-			for (Doador doador : doadorList) {
+			for (Doador doador : getMediaIdadePorTipoSanguinioRequestBodyDTO.getListaDoadores()) {
 				Integer idadeDoador = doador.getIdade();
 				if (idadeDoador > faixaIdadeList.get(IDADE_MINIMA) && idadeDoador <= faixaIdadeList.get(IDADE_MAXIMA)) {
 					toalImcFaixaIdade = toalImcFaixaIdade.add(this.calculaIMC(doador));
@@ -96,7 +99,7 @@ public class DoacaoServicos {
 			}
 
 			GetImcMedioPorFaixaDeIdadeDTO retorno = GetImcMedioPorFaixaDeIdadeDTOBuilder.getinstance()
-					.faixaDeIdade(faixaIdade).mediaImcPorFaixaDeIdade(mediaImcPorFaixaDeIdade).builder();
+					.faixaDeIdade(getMediaIdadePorTipoSanguinioRequestBodyDTO.getFaixaIniciaEfinalSeparadosPorVirgula()).mediaImcPorFaixaDeIdade(mediaImcPorFaixaDeIdade).builder();
 
 			return retorno;
 
@@ -109,13 +112,12 @@ public class DoacaoServicos {
 		
 	}
 
-	public GetMediaIdadePorTipoSanguinioDTO getMediaIdadePorTipoSanguinio(List<Doador> doadorList,
-			String tipoSanguinio) {
+	public GetMediaIdadePorTipoSanguinioDTO getMediaIdadePorTipoSanguinio(GetMediaIdadePorTipoSanguinioRequestBodyDTO getMediaIdadePorTipoSanguinioRequestBodyDTO) {
 		Integer somaIdadeDoadoresPorTipoSanguinio = 0;
 		Integer numeroGrandezas = 0;
 		Integer mediaIdade = 0;
-		for (Doador doador : doadorList) {
-			if (doador.getTipoSanguineo().equals(tipoSanguinio)) {
+		for (Doador doador : getMediaIdadePorTipoSanguinioRequestBodyDTO.getListaDoadores()) {
+			if (doador.getTipoSanguineo().equals(getMediaIdadePorTipoSanguinioRequestBodyDTO.getTipoSanguinio())) {
 				somaIdadeDoadoresPorTipoSanguinio = somaIdadeDoadoresPorTipoSanguinio + doador.getIdade();
 				numeroGrandezas++;
 
@@ -127,7 +129,7 @@ public class DoacaoServicos {
 		}
 
 		return GetMediaIdadePorTipoSanguinioDTOBuilder.getInstase().mediaIdadePorTipoSanguinio(mediaIdade)
-				.tipoSanguinio(tipoSanguinio).builder();
+				.tipoSanguinio(getMediaIdadePorTipoSanguinioRequestBodyDTO.getTipoSanguinio()).builder();
 	}
 
 	public ListaDoadoresSeparadosPorEstadoDTO getDoadoresPorEstado(List<Doador> doadorList) {
